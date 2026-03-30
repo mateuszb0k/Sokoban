@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QWidget,
-    QLabel,QMessageBox,
+    QLabel,QMessageBox,QFileDialog,
     QVBoxLayout, QPushButton, QHBoxLayout, QGraphicsView, QGraphicsScene,QGraphicsPixmapItem,QGraphicsRectItem
 )
 from PyQt6.QtCore import Qt
@@ -21,6 +21,7 @@ class MainWindow(QMainWindow):
             'box' : QPixmap('../assets/box.png').scaled(self.tile_size, self.tile_size),
             'player' : QPixmap('../assets/player_model.png').scaled(self.tile_size, self.tile_size),
             'target' : QPixmap('../assets/target.png').scaled(self.tile_size, self.tile_size),
+            'box_on_target' : QPixmap('../assets/box_on_target.png').scaled(self.tile_size, self.tile_size)
         }
 
         self.game = game_state
@@ -30,6 +31,8 @@ class MainWindow(QMainWindow):
         layout  = QHBoxLayout()
         self.scene = QGraphicsScene()
         self.graphics = QGraphicsView()
+        self.graphics.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.graphics.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.graphics.setScene(self.scene)
         layout.addWidget(self.graphics)
         layout1 = QVBoxLayout()
@@ -37,6 +40,8 @@ class MainWindow(QMainWindow):
         self.steps = QLabel("Steps: 0")
         self.box_pushes = QLabel("Pushes: 0")
         # self.undo_button = QPushButton("Undo")
+        self.load_file = QPushButton("Load File")
+        self.load_file.clicked.connect(self.choose_file)
         # self.redo_button = QPushButton("Redo")
         # self.reset_button = QPushButton("Reset")
         # self.hint_button = QPushButton("Hint")
@@ -46,6 +51,7 @@ class MainWindow(QMainWindow):
         # layout1.addWidget(self.redo_button)
         # layout1.addWidget(self.reset_button)
         # layout1.addWidget(self.hint_button)
+        layout1.addWidget(self.load_file)
         layout1.addStretch()
         layout.addLayout(layout1)
         central_widget.setLayout(layout)
@@ -62,6 +68,7 @@ class MainWindow(QMainWindow):
         box = self.textures['box']
         player = self.textures['player']
         target = self.textures['target']
+        box_on_target = self.textures['box_on_target']
         self.steps.setText(f"Steps: {steps}")
         self.box_pushes.setText(f"Box Pushes: {pushes}")
         for y in range(self.game.level.height):
@@ -86,6 +93,9 @@ class MainWindow(QMainWindow):
                 if (x,y) in self.game.game_state.box_position:
                     pixmap_item = QGraphicsPixmapItem(box)
                     pixmap_item.setPos(acc_x, acc_y)
+                    if self.game.level.target_array[y][x]:
+                        pixmap_item = QGraphicsPixmapItem(box_on_target)
+                        pixmap_item.setPos(acc_x, acc_y)
                     self.scene.addItem(pixmap_item)
                 if (x,y) ==self.block_to_highlight:
                     item = QGraphicsRectItem(0, 0, self.tile_size, self.tile_size)
@@ -124,6 +134,16 @@ class MainWindow(QMainWindow):
                     self.block_to_highlight = (self.game.game_state.player_x+1, self.game.game_state.player_y)
             else:
                 self.block_to_highlight = None
+        if self.game.check_win():
+            QMessageBox.information(self, "You Won!", "You Won!")
+            self.updateUI()
+            l = LevelGenerator(self.game.level.width, self.game.level.height,len(self.game.level.box_position))
+            self.game = Game(self.game.level.width, self.game.level.height,l.level)
+            self.block_to_highlight = None
+            self.updateUI()
+
+        elif self.game.check_deadlock():
+            QMessageBox.information(self, "Deadlock", "Deadlock, Undo your last move or reset")
 
 
         self.updateUI()
@@ -133,10 +153,25 @@ class MainWindow(QMainWindow):
     def handle_redo(self):
         self.game.redo()
         self.updateUI()
+    def choose_file(self):
+        dir,_ = QFileDialog.getOpenFileName(caption = "Choose a file")
+        list = []
+        if dir:
+            with open(dir, 'r') as f:
+                for line in f:
+                    line = line.rstrip('\n')
+                    list.append(line)
+            h = len(list)
+            w = len(list[0])
+            self.game = Game(w,h,list)
+            self.block_to_highlight = None
+            self.updateUI()
+        else:
+            return
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    x,y,b=12,12,5
+    x,y,b=10,10,5
     board = LevelGenerator(x,y,b)
     game = Game(x,y,board.level)
     window = MainWindow(game)

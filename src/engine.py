@@ -54,11 +54,13 @@ class Game:
     def redo(self):
         if self.redo_stack:
             popped = self.redo_stack.pop()
-            current_state = (self.game_state.player_x, self.game_state.player_y, self.game_state.box_position.copy())
+            current_state = (self.game_state.player_x, self.game_state.player_y, self.game_state.box_position.copy(),self.pushes_count,self.moves_count)
             self.undo_stack.append(current_state)
             self.game_state.player_x = popped[0]
             self.game_state.player_y = popped[1]
             self.game_state.box_position = popped[2]
+            self.pushes_count = popped[3]
+            self.moves_count = popped[4]
         else:
             return
     def check_win(self):

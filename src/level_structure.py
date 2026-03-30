@@ -74,7 +74,7 @@ class LevelGenerator():
                     self.level[y][x] = '#'
                 if x ==0 or x ==dim_x-1:
                     self.level[y][x] = '#'
-        num_walls = min(dim_x,dim_y)-min(dim_x,dim_y)//10#arbitrary
+        num_walls = random.randint(min(dim_x,dim_y)//2,min(dim_x,dim_y)+random.randint(0,3))
         random_walls=0
         while random_walls<num_walls:
             x=random.randint(0,dim_x-1)
