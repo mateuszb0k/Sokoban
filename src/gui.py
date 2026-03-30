@@ -10,7 +10,9 @@ import sys
 from level_structure import LevelGenerator,GameState
 from solver import GameSolver
 
-
+'''
+Simple PyQt visualisation
+'''
 class MainWindow(QMainWindow):
     def __init__(self,game_state:Game):
         super().__init__()

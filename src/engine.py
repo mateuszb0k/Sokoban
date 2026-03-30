@@ -2,6 +2,9 @@ import copy
 from level_structure import LevelStructure, GameState,LevelGenerator
 from renderer import View
 from solver import GameSolver
+'''
+Game Class handling the logic 
+'''
 class Game:
     def __init__(self,level_w,level_h,board):
         ##init a map

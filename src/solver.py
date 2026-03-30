@@ -1,6 +1,9 @@
 from level_structure import LevelStructure,GameState
 import heapq
 from collections import deque,defaultdict
+'''
+A* solver with added optimizations to improve solution time
+'''
 class GameSolver:
     def __init__(self,level: LevelStructure,game_state: GameState):
         self.level = level

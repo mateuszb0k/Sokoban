@@ -1,4 +1,7 @@
 from level_structure import LevelStructure, GameState,LevelGenerator
+'''
+Mock console renderer class used for debugging purposes
+'''
 class View:
     def __init__(self):
         self.board = []
