@@ -1,4 +1,4 @@
-from level_structure import LevelStructure, GameState
+from level_structure import LevelStructure, GameState,LevelGenerator
 class View:
     def __init__(self):
         self.board = []
@@ -30,18 +30,10 @@ class View:
             self.board.append(row)
 
 if __name__ == '__main__':
-    test_map = [
-        "  ##### ",
-        "###   # ",
-        "#.@$  # ",
-        "### * # ",
-        "#..*$ # ",
-        "#  @  # ",
-        "####### "
-    ]
-    level = LevelStructure(level_w=len(test_map[0]), level_h=len(test_map))
+    test_map = LevelGenerator(30,10,10)
+    level = LevelStructure(level_w=len(test_map.level[0]), level_h=len(test_map.level))
     print(level.height, level.width)
-    level.parse(test_map, level_w=len(test_map[0]), level_h=len(test_map))
+    level.parse(test_map.level, level_w=len(test_map.level[0]), level_h=len(test_map.level))
     game_state = GameState(level)
     view = View()
     view.draw_board(level, game_state)
