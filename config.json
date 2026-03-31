@@ -1,8 +1,8 @@
 {
   "tile_size": 64,
-  "default_width": 12,
-  "default_height": 9,
-  "default_boxes": 5,
-  "solver_max_iterations": 15000,
+  "default_width": 10,
+  "default_height": 10,
+  "default_boxes": 4,
+  "solver_max_iterations": 400000,
   "map": ""
 }

@@ -10,6 +10,7 @@ class GameSolver:
         self.level = level
         self.config = ConfigManager()
         self.max_iters = self.config.max_iters
+        print(self.max_iters)
         self.game_state = game_state
         self.alive_squares = self.build_alive_squares()
     def manhattan_distance(self,a,b):
@@ -105,6 +106,7 @@ class GameSolver:
                             counter +=1
                             heapq.heappush(queue,(new_prio,counter,new_state,moves))
             iters+=1
+            print(iters)
         return None
     def get_reachable_spaces(self,player_x,player_y,current_boxes):
         reachable = defaultdict(list)
@@ -171,23 +173,26 @@ class GameSolver:
                 visited.add((nx,ny))
                 queue.append((nx,ny))
         return min(visited)
-    def check_freeze_deadlock(self,bx,by,current_boxes):
-        quadrants = [
-            [(0, 0), (1, 0), (0, 1), (1, 1)],
-            [(0, 0), (-1, 0), (0, 1), (-1, 1)],
-            [(0, 0), (1, 0), (0, -1), (1, -1)],
-            [(0, 0), (-1, 0), (0, -1), (-1, -1)]
-        ]
-        for quad in quadrants:
-            is_deadlocked = True
-            for dx,dy in quad:
-                nx,ny = dx+bx,dy+by
-                if not (self.level.wall_array[ny][nx] or (nx, ny) in current_boxes):
-                    is_deadlocked = False
-                    break
-            if is_deadlocked:
-                return True
-        return False
+    def check_freeze_deadlock(self, bx, by, current_boxes):
+            quadrants = [
+                [(0, 0), (1, 0), (0, 1), (1, 1)],
+                [(0, 0), (-1, 0), (0, 1), (-1, 1)],
+                [(0, 0), (1, 0), (0, -1), (1, -1)],
+                [(0, 0), (-1, 0), (0, -1), (-1, -1)]
+            ]
+            for quad in quadrants:
+                is_deadlocked = True
+                has_box_not_on_target = False
+                for dx, dy in quad:
+                    nx, ny = bx + dx, by + dy
+                    if not (self.level.wall_array[ny][nx] or (nx, ny) in current_boxes):
+                        is_deadlocked = False
+                        break
+                    if (nx, ny) in current_boxes and not self.level.target_array[ny][nx]:
+                        has_box_not_on_target = True
+                if is_deadlocked and has_box_not_on_target:
+                    return True
+            return False
 
 
 

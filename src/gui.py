@@ -83,12 +83,11 @@ class MainWindow(QMainWindow):
                     self.scene.addItem(self.factory.create_sprite('box',x,y))
                     if self.game.level.target_array[y][x]:
                         self.scene.addItem(self.factory.create_sprite('box_on_target',x,y))
-                if (x,y) ==self.block_to_highlight:
-                    acc_x,acc_y = x*self.tile_size,y*self.tile_size
+                if (x, y) == self.block_to_highlight:
                     item = QGraphicsRectItem(0, 0, self.tile_size, self.tile_size)
-                    brush = QBrush(QColor(0,255,0,120))
+                    brush = QBrush(QColor(0, 255, 0, 120))
                     item.setBrush(brush)
-                    item.setPos(acc_x, acc_y)
+                    item.setPos(x * self.tile_size, y * self.tile_size)
                     self.scene.addItem(item)
 
     def keyPressEvent(self, event):
