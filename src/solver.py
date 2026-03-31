@@ -1,12 +1,15 @@
 from level_structure import LevelStructure,GameState
 import heapq
 from collections import deque,defaultdict
+from config_manager import ConfigManager
 '''
 A* solver with added optimizations to improve solution time
 '''
 class GameSolver:
     def __init__(self,level: LevelStructure,game_state: GameState):
         self.level = level
+        self.config = ConfigManager()
+        self.max_iters = self.config.max_iters
         self.game_state = game_state
         self.alive_squares = self.build_alive_squares()
     def manhattan_distance(self,a,b):
@@ -82,7 +85,7 @@ class GameSolver:
         push that way so if h values are equal we get the lowest counter
         '''
         heapq.heappush(queue,(h,counter,self.game_state,solution))
-        while queue and iters<15000:
+        while queue and iters<self.max_iters:
             prio,cnt,current_state,sol = heapq.heappop(queue)
             current_state_tuple = self.get_state_tuple(current_state)
             if current_state_tuple in visited:

@@ -74,7 +74,7 @@ class LevelGenerator():
                     self.level[y][x] = '#'
                 if x ==0 or x ==dim_x-1:
                     self.level[y][x] = '#'
-        num_walls = random.randint(min(dim_x,dim_y)//2,min(dim_x,dim_y)+random.randint(0,3))
+        num_walls = random.randint(max(dim_x,dim_y)//4,min(dim_x,dim_y)+random.randint(0,3))
         random_walls=0
         while random_walls<num_walls:
             x=random.randint(0,dim_x-1)
@@ -94,7 +94,7 @@ class LevelGenerator():
                 targets.append((x,y))
                 boxes_arr.append((x,y))
                 placed+=1
-        for _ in range(50000):
+        for _ in range(100000):
             directions = [(0,1),(0,-1),(-1,0),(1,0)]
             vector=random.choice(directions)
             n_px = p_x+vector[0]
@@ -105,7 +105,7 @@ class LevelGenerator():
                 box_x = p_x-vector[0]
                 box_y = p_y-vector[1]
                 if (box_x,box_y) in boxes_arr and (p_x,p_y) not in boxes_arr:
-                    if random.choice([True,False]):
+                    if random.choice([True,True]):
                         boxes_arr.remove((box_x, box_y))
                         boxes_arr.append((p_x,p_y))
                         p_x = n_px

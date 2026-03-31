@@ -9,6 +9,8 @@ from engine import Game
 import sys
 from level_structure import LevelGenerator,GameState
 from solver import GameSolver
+from config_manager import ConfigManager
+from factory import EntityFactory
 
 '''
 Simple PyQt visualisation
@@ -16,7 +18,8 @@ Simple PyQt visualisation
 class MainWindow(QMainWindow):
     def __init__(self,game_state:Game):
         super().__init__()
-        self.tile_size = 64
+        self.config = ConfigManager()
+        self.tile_size = self.config.tile_size
         self.textures = {
             'wall' : QPixmap('../assets/wall.png').scaled(self.tile_size, self.tile_size),
             'floor' : QPixmap('../assets/floor_tile.png').scaled(self.tile_size, self.tile_size),
@@ -25,7 +28,7 @@ class MainWindow(QMainWindow):
             'target' : QPixmap('../assets/target.png').scaled(self.tile_size, self.tile_size),
             'box_on_target' : QPixmap('../assets/box_on_target.png').scaled(self.tile_size, self.tile_size)
         }
-
+        self.factory = EntityFactory(self.textures,self.tile_size)
         self.game = game_state
         self.setWindowTitle("Sokoban")
         central_widget = QWidget()
@@ -65,41 +68,23 @@ class MainWindow(QMainWindow):
         self.scene.clear()
         steps = self.game.moves_count
         pushes = self.game.pushes_count
-        floor = self.textures['floor']
-        wall = self.textures['wall']
-        box = self.textures['box']
-        player = self.textures['player']
-        target = self.textures['target']
-        box_on_target = self.textures['box_on_target']
         self.steps.setText(f"Steps: {steps}")
         self.box_pushes.setText(f"Box Pushes: {pushes}")
         for y in range(self.game.level.height):
             for x in range(self.game.level.width):
-                acc_x = x * self.tile_size
-                acc_y = y * self.tile_size
-                pixmap_item = QGraphicsPixmapItem(floor)
-                pixmap_item.setPos(acc_x, acc_y)
-                self.scene.addItem(pixmap_item)
+                self.scene.addItem(self.factory.create_sprite('floor',x,y))
                 if self.game.level.target_array[y][x]:
-                    pixmap_item = QGraphicsPixmapItem(target)
-                    pixmap_item.setPos(acc_x, acc_y)
-                    self.scene.addItem(pixmap_item)
+                    self.scene.addItem(self.factory.create_sprite('target',x,y))
                 if self.game.level.wall_array[y][x]:
-                    pixmap_item = QGraphicsPixmapItem(wall)
-                    pixmap_item.setPos(acc_x, acc_y)
-                    self.scene.addItem(pixmap_item)
+                    self.scene.addItem(self.factory.create_sprite('wall',x,y))
                 if x==self.game.game_state.player_x and y==self.game.game_state.player_y:
-                    pixmap_item = QGraphicsPixmapItem(player)
-                    pixmap_item.setPos(acc_x, acc_y)
-                    self.scene.addItem(pixmap_item)
+                    self.scene.addItem(self.factory.create_sprite('player',x,y))
                 if (x,y) in self.game.game_state.box_position:
-                    pixmap_item = QGraphicsPixmapItem(box)
-                    pixmap_item.setPos(acc_x, acc_y)
+                    self.scene.addItem(self.factory.create_sprite('box',x,y))
                     if self.game.level.target_array[y][x]:
-                        pixmap_item = QGraphicsPixmapItem(box_on_target)
-                        pixmap_item.setPos(acc_x, acc_y)
-                    self.scene.addItem(pixmap_item)
+                        self.scene.addItem(self.factory.create_sprite('box_on_target',x,y))
                 if (x,y) ==self.block_to_highlight:
+                    acc_x,acc_y = x*self.tile_size,y*self.tile_size
                     item = QGraphicsRectItem(0, 0, self.tile_size, self.tile_size)
                     brush = QBrush(QColor(0,255,0,120))
                     item.setBrush(brush)
@@ -123,6 +108,8 @@ class MainWindow(QMainWindow):
             self.handle_redo()
         elif move == Qt.Key.Key_R:
             self.game.reset()
+        elif move == Qt.Key.Key_C:
+            self.handle_hot_reload()
         elif move == Qt.Key.Key_H:  # hint
             solution = GameSolver(self.game.level, self.game.game_state).solve()
             if solution:
@@ -170,10 +157,23 @@ class MainWindow(QMainWindow):
             self.updateUI()
         else:
             return
-
+    def handle_hot_reload(self):
+        self.config.load_config()
+        self.tile_size = self.config.tile_size
+        self.textures = {
+            'wall' : QPixmap('../assets/wall.png').scaled(self.tile_size, self.tile_size),
+            'floor' : QPixmap('../assets/floor_tile.png').scaled(self.tile_size, self.tile_size),
+            'box' : QPixmap('../assets/box.png').scaled(self.tile_size, self.tile_size),
+            'player' : QPixmap('../assets/player_model.png').scaled(self.tile_size, self.tile_size),
+            'target' : QPixmap('../assets/target.png').scaled(self.tile_size, self.tile_size),
+            'box_on_target' : QPixmap('../assets/box_on_target.png').scaled(self.tile_size, self.tile_size)
+        }
+        self.factory = EntityFactory(self.textures,self.tile_size)
+        self.updateUI()
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    x,y,b=10,10,5
+    config = ConfigManager()
+    x,y,b=config.width,config.height,config.boxes
     board = LevelGenerator(x,y,b)
     game = Game(x,y,board.level)
     window = MainWindow(game)
