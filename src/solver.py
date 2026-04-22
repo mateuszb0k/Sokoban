@@ -32,7 +32,7 @@ class GameSolver:
         return total
     def get_state_tuple(self,game: GameState):
         sorted_boxes = tuple(sorted(game.box_position))
-        can_x,can_y = self.get_position(game.player_x,game.player_y,sorted_boxes)
+        can_x,can_y = self.get_position(game.players["local"][0],game.players["local"][1],sorted_boxes)
         return (can_x, can_y, sorted_boxes)
     def is_corner(self,position):
             x,y = position
@@ -53,7 +53,7 @@ class GameSolver:
     def get_neighbors(self,game: GameState):
         neighbors = []
         directions = [((0, 1), 's'), ((0, -1), 'w'), ((-1, 0), 'a'), ((1, 0), 'd')]
-        reachable = self.get_reachable_spaces(game.player_x,game.player_y,game.box_position)
+        reachable = self.get_reachable_spaces(game.players["local"][0],game.players["local"][1],game.box_position)
         for box_x,box_y in game.box_position:
             for direction,key in directions:
                 n_box_x,n_box_y = box_x+direction[0], box_y+direction[1]

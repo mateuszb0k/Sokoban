@@ -9,7 +9,10 @@ class ConfigManager:
         self.boxes = 2
         self.max_iters = 10000
         self.startup_map = ''
+        self.max_pushes = 3
+        self.range = 4
         self.load_config()
+
     def load_config(self):
         try:
             if os.path.exists(self.path):
@@ -33,6 +36,12 @@ class ConfigManager:
                 map = config.get('map',self.startup_map)
                 if isinstance(map,str) and map !='':
                     self.startup_map = map
+                max_pushes = config.get('max_pushes',self.max_pushes)
+                if isinstance(max_pushes,int) and max_pushes>0:
+                    self.max_pushes = max_pushes
+                range = config.get('range',self.range)
+                if isinstance(range,int) and range>0:
+                    self.range = range
 
         except Exception as e:
             print(e,"Using default config")

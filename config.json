@@ -2,7 +2,9 @@
   "tile_size": 64,
   "default_width": 10,
   "default_height": 10,
-  "default_boxes": 4,
+  "default_boxes": 6,
   "solver_max_iterations": 400000,
-  "map": ""
+  "map": "",
+  "max_pushes" : 999,
+  "range" : 2
 }

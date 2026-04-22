@@ -51,7 +51,7 @@ class LevelStructure():
                 board.append(line)
         x = len(board[0])
         y = len(board)
-        level  = LevelStructure(x,y)
+        level = LevelStructure(x,y)
         level.parse(board,x,y)
         return level
 
@@ -61,8 +61,9 @@ class LevelStructure():
 class GameState():
     def __init__(self,level: LevelStructure):
         self.box_position = level.box_position.copy()
-        self.player_x = level.player_x
-        self.player_y = level.player_y
+        self.players = {
+            "local" : (level.player_x,level.player_y),
+        }
 class LevelGenerator():
     def __init__(self,dim_x,dim_y,boxes):
         self.level = []
